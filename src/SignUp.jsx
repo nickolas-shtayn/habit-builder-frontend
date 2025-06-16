@@ -1,11 +1,16 @@
 import React, { useState } from "react";
 import AuthInput from "./AuthInput";
 import AuthButton from "./AuthButton";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
   const handleEmail = (event) => {
     setEmail(event.target.value);
@@ -25,10 +30,75 @@ const SignUp = () => {
     setConfirmPassword("");
   };
 
-  const handleLoginRedirect = () => {};
+  const handleLoginRedirect = () => {
+    navigate("/login");
+  };
+
+  const validateEmail = (value) => {
+    if (!value) {
+      return "Email required";
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(value)) {
+      return "Invalid email format";
+    }
+
+    return "";
+  };
+
+  const handleEmailBlur = () => {
+    const errorMessage = validateEmail(email);
+    setEmailError(errorMessage);
+  };
+
+  const validatePassword = (value) => {
+    if (!value) {
+      return "Password is required";
+    }
+
+    if (value.length < 8) {
+      return "Password is too short";
+    }
+    return "";
+  };
+
+  const handlePasswordBlur = () => {
+    const errorMessage = validatePassword(password);
+    setPasswordError(errorMessage);
+  };
+
+  const validatePasswordConfirmation = (value) => {
+    if (!value) {
+      return "Password confirmation required";
+    }
+
+    if (value !== password) {
+      return "Passwords don't match";
+    }
+
+    return "";
+  };
+
+  const handlePasswordConfirmationBlur = () => {
+    const errorMessage = validatePasswordConfirmation(confirmPassword);
+    setConfirmPasswordError(errorMessage);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    const emailError = validateEmail(email);
+    const passwordError = validatePassword(password);
+    const confirmPasswordError = validatePasswordConfirmation(confirmPassword);
+
+    setEmailError(emailError);
+    setPasswordError(passwordError);
+    setConfirmPasswordError(confirmPasswordError);
+
+    if (emailError || passwordError || confirmPasswordError) {
+      return;
+    }
 
     try {
       const response = await fetch("http://localhost:3000/users", {
@@ -43,10 +113,9 @@ const SignUp = () => {
       });
 
       const data = await response.json();
-
       localStorage.setItem("jwt", data.token);
-
       reset();
+      navigate("/onboarding");
     } catch (error) {
       console.log(error);
     }
@@ -63,7 +132,9 @@ const SignUp = () => {
           placeholder="example@email.com"
           value={email}
           onChange={handleEmail}
+          onBlur={handleEmailBlur}
         />
+        {emailError && <span>{emailError}</span>}
         <AuthInput
           id="2"
           label="Password"
@@ -71,7 +142,9 @@ const SignUp = () => {
           placeholder="Your password"
           value={password}
           onChange={handlePassword}
+          onBlur={handlePasswordBlur}
         />
+        {passwordError && <span>{passwordError}</span>}
         <AuthInput
           id="3"
           label="Confirm Password"
@@ -79,11 +152,13 @@ const SignUp = () => {
           placeholder="Your password"
           value={confirmPassword}
           onChange={handleConfirmPassword}
+          onBlur={handlePasswordConfirmationBlur}
         />
+        {confirmPasswordError && <span>{confirmPasswordError}</span>}
         <AuthButton type="submit" name="Sign up" />
         <br />
-        <AuthButton name="Login" onClick={handleLoginRedirect} />
       </form>
+      <AuthButton name="Login" onClick={handleLoginRedirect} />
     </>
   );
 };

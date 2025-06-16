@@ -11,6 +11,7 @@ const AuthInput = (props) => {
         value={props.value}
         checked={props.checked}
         onChange={props.onChange}
+        onBlur={props.onBlur}
       />
     </>
   );
