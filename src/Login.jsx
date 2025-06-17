@@ -23,10 +23,6 @@ const Login = () => {
     setRememberMe(event.target.checked);
   };
 
-  const handleSignUpRedirect = () => {
-    navigate("/signup");
-  };
-
   const reset = () => {
     setEmail("");
     setPassword("");

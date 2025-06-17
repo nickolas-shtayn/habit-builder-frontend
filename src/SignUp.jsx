@@ -30,10 +30,6 @@ const SignUp = () => {
     setConfirmPassword("");
   };
 
-  const handleLoginRedirect = () => {
-    navigate("/login");
-  };
-
   const validateEmail = (value) => {
     if (!value) {
       return "Email required";
