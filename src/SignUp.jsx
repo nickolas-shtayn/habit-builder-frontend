@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import AuthInput from "./AuthInput";
 import AuthButton from "./AuthButton";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -158,7 +158,9 @@ const SignUp = () => {
         <AuthButton type="submit" name="Sign up" />
         <br />
       </form>
-      <AuthButton name="Login" onClick={handleLoginRedirect} />
+      <Link to="/login">
+        <AuthButton name="Login" />
+      </Link>
     </>
   );
 };

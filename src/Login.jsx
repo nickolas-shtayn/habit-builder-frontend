@@ -139,11 +139,13 @@ const Login = () => {
           checked={rememberMe}
           onChange={handleRememberMe}
         />
-        <Link to="/forgotpassword">Forgot Password?</Link>
+        <Link to="/forgot-password">Forgot Password?</Link>
         <AuthButton type="submit" name="Login" />
         <br></br>
       </form>
-      <AuthButton name="Sign up" onClick={handleSignUpRedirect} />
+      <Link to="/signup">
+        <AuthButton name="Sign up" />
+      </Link>
     </>
   );
 };
