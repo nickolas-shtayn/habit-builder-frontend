@@ -6,6 +6,8 @@ import Onboarding from "./onboarding/Onboarding";
 import ForgotPassword from "./ForgotPassword";
 import Dashboard from "./Dashboard";
 import Unauthorized from "./Unauthorized";
+import VerifyForgotPassword from "./VerifyForgotPassword";
+import ResetPassword from "./ResetPassword";
 
 export default function App() {
   return (
@@ -17,7 +19,11 @@ export default function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
-
+        <Route
+          path="/forgot-password-verify"
+          element={<VerifyForgotPassword />}
+        />
+        <Route path="/reset-password" element={<ResetPassword />} />
         {/* Require Auth */}
         <Route
           path="/onboarding"

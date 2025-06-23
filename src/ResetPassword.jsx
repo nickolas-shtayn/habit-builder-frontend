@@ -1,20 +1,14 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import AuthInput from "./AuthInput";
 import AuthButton from "./AuthButton";
 import { useNavigate, Link } from "react-router-dom";
 
-const SignUp = () => {
+const ResetPassword = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
-
-  const handleEmail = (event) => {
-    setEmail(event.target.value);
-  };
 
   const handlePassword = (event) => {
     setPassword(event.target.value);
@@ -25,27 +19,8 @@ const SignUp = () => {
   };
 
   const reset = () => {
-    setEmail("");
     setPassword("");
     setConfirmPassword("");
-  };
-
-  const validateEmail = (value) => {
-    if (!value) {
-      return "Email required";
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(value)) {
-      return "Invalid email format";
-    }
-
-    return "";
-  };
-
-  const handleEmailBlur = () => {
-    const errorMessage = validateEmail(email);
-    setEmailError(errorMessage);
   };
 
   const validatePassword = (value) => {
@@ -84,34 +59,34 @@ const SignUp = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const emailError = validateEmail(email);
+    const resetCode = localStorage.getItem("resetCode");
+    const email = localStorage.getItem("verification-email");
+
     const passwordError = validatePassword(password);
     const confirmPasswordError = validatePasswordConfirmation(confirmPassword);
 
-    setEmailError(emailError);
     setPasswordError(passwordError);
     setConfirmPasswordError(confirmPasswordError);
 
-    if (emailError || passwordError || confirmPasswordError) {
+    if (passwordError || confirmPasswordError) {
       return;
     }
 
     try {
-      const response = await fetch("http://localhost:3000/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
-
+      const response = await fetch(
+        "http://localhost:3000/auth/reset-password/complete",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, resetCode, password }),
+        }
+      );
       const data = await response.json();
-      localStorage.setItem("jwt", data.token);
       reset();
-      navigate("/onboarding");
+      localStorage.clear();
+      navigate("/login");
     } catch (error) {
       console.log(error);
     }
@@ -119,21 +94,12 @@ const SignUp = () => {
 
   return (
     <>
-      <h1>Sign Up</h1>
+      <h1>Set new password</h1>
+      <p>Please pick your new password</p>
       <form onSubmit={handleSubmit}>
         <AuthInput
-          id="1"
-          label="Email"
-          type="email"
-          placeholder="example@email.com"
-          value={email}
-          onChange={handleEmail}
-          onBlur={handleEmailBlur}
-        />
-        {emailError && <span>{emailError}</span>}
-        <AuthInput
-          id="2"
           label="Password"
+          id="1"
           type="password"
           placeholder="Your password"
           value={password}
@@ -142,8 +108,8 @@ const SignUp = () => {
         />
         {passwordError && <span>{passwordError}</span>}
         <AuthInput
-          id="3"
-          label="Confirm Password"
+          label="Confirm password"
+          id="2"
           type="password"
           placeholder="Your password"
           value={confirmPassword}
@@ -151,14 +117,13 @@ const SignUp = () => {
           onBlur={handlePasswordConfirmationBlur}
         />
         {confirmPasswordError && <span>{confirmPasswordError}</span>}
-        <AuthButton type="submit" name="Sign up" />
-        <br />
+        <AuthButton type="submit" name="Reset password" />
       </form>
       <Link to="/login">
-        <AuthButton name="Login" />
+        <AuthButton name="Back to login" />
       </Link>
     </>
   );
 };
 
-export default SignUp;
+export default ResetPassword;

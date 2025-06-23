@@ -8,8 +8,6 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
 
   const handleEmail = (event) => {
     setEmail(event.target.value);
@@ -29,52 +27,8 @@ const Login = () => {
     setRememberMe(false);
   };
 
-  const validateEmail = (value) => {
-    if (!value) {
-      return "Email required";
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(value)) {
-      return "Invalid email format";
-    }
-
-    return "";
-  };
-
-  const handleEmailBlur = () => {
-    const errorMessage = validateEmail(email);
-    setEmailError(errorMessage);
-  };
-
-  const validatePassword = (value) => {
-    if (!value) {
-      return "Password is required";
-    }
-
-    if (value.length < 8) {
-      return "Password is too short";
-    }
-    return "";
-  };
-
-  const handlePasswordBlur = () => {
-    const errorMessage = validatePassword(password);
-    setPasswordError(errorMessage);
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    const emailError = validateEmail(email);
-    const passwordError = validatePassword(password);
-
-    setEmailError(emailError);
-    setPasswordError(passwordError);
-
-    if (emailError || passwordError) {
-      return;
-    }
 
     try {
       const response = await fetch("http://localhost:3000/auth/login", {
@@ -115,9 +69,7 @@ const Login = () => {
           placeholder="example@email.com"
           value={email}
           onChange={handleEmail}
-          onBlur={handleEmailBlur}
         />
-        {emailError && <span>{emailError}</span>}
         <AuthInput
           id="2"
           label="Password"
@@ -125,9 +77,7 @@ const Login = () => {
           placeholder="Your password"
           value={password}
           onChange={handlePassword}
-          onBlur={handlePasswordBlur}
         />
-        {passwordError && <span>{passwordError}</span>}
         <AuthInput
           id="3"
           label="Remember Me"
