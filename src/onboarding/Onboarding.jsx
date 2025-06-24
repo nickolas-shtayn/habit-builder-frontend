@@ -1,23 +1,8 @@
 import React from "react";
-// import { useState } from "react";
-// import HabitBuilderStart from "./HabitBuilderStart";
+import HabitCircle from "../HabitCircle/HabitCircle";
 
 const Onboarding = () => {
-  // const [currentStep, setCurrentStep] = useState(1);
-
-  // const nextStep = () => {
-  //   setCurrentStep(currentStep + 1);
-  // };
-
-  // const renderStep = () => {
-  //   switch (currentStep) {
-  //     case 1:
-  //       return <HabitBuilderStart />;
-  //   }
-  // };
-
-  // return renderStep();
-  return;
+  return <></>;
 };
 
 export default Onboarding;
