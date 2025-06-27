@@ -5,6 +5,7 @@ import Login from "./Login";
 import Onboarding from "./onboarding/Onboarding";
 import ForgotPassword from "./ForgotPassword";
 import Dashboard from "./Dashboard";
+import CreateHabit from "./CreateHabit";
 import Unauthorized from "./Unauthorized";
 import VerifyForgotPassword from "./VerifyForgotPassword";
 import ResetPassword from "./ResetPassword";
@@ -39,6 +40,15 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/create-habit"
+          element={
+            <ProtectedRoute>
+              <CreateHabit />
             </ProtectedRoute>
           }
         />
