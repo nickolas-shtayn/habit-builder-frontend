@@ -5,44 +5,88 @@ import { useState } from "react";
 const HabitCircle = ({
   // Size props
   size = 200,
-
   // Color props
   primaryColor = "gray",
   expandColor = "#333",
-
   // Icon props
   icon = null,
   iconSize = "2rem",
-
   // Text props
   habitName = "HABIT",
-
   // Timing props
   pressDuration = 1000,
-
   // Event handlers
   onPressStart,
   onComplete,
   onReset,
+  id,
+  // Completion status
+  isCompletedToday = false,
 }) => {
   const [isExpanding, setIsExpanding] = useState(false);
-  const [isComplete, setIsComplete] = useState(false);
+  const [isComplete, setIsComplete] = useState(isCompletedToday);
 
   const handlePressStart = () => {
-    setIsExpanding(true);
-    setIsComplete(false);
-    if (onPressStart) onPressStart();
+    if (!isComplete) {
+      // Only start if not already complete
+      setIsExpanding(true);
+      if (onPressStart) onPressStart();
+    }
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     setIsComplete(true);
-    if (onComplete) onComplete();
+    setIsExpanding(false); // Stop expanding when complete
+
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    // POST request for habit completion
+    const response = await fetch(
+      `http://localhost:3000/habits/${id}/complete`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (!response.ok) {
+      console.log(response);
+    }
   };
 
   const handleReset = () => {
     setIsExpanding(false);
     setIsComplete(false);
     if (onReset) onReset();
+  };
+
+  const handleUndo = async () => {
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    // POST request for habit undo
+    const response = await fetch(
+      `http://localhost:3000/habits/${id}/complete`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (!response.ok) {
+      console.log(response);
+    }
+
+    handleReset();
   };
 
   return (
@@ -56,6 +100,12 @@ const HabitCircle = ({
           justifyContent: "center",
           width: "100%",
           height: "100%",
+          WebkitTapHighlightColor: "transparent",
+          WebkitTouchCallout: "none",
+          userSelect: "none",
+          WebkitUserSelect: "none",
+          MozUserSelect: "none",
+          msUserSelect: "none",
         }}
       >
         <div
@@ -71,7 +121,6 @@ const HabitCircle = ({
             expandColor={expandColor}
             isExpanding={isExpanding}
             isComplete={isComplete}
-            onReset={handleReset}
           />
           <PressHoldCircle
             primaryColor={primaryColor}
@@ -80,6 +129,7 @@ const HabitCircle = ({
             onPressStart={handlePressStart}
             onComplete={handleComplete}
             onReset={handleReset}
+            isComplete={isComplete}
           />
           <div
             style={{
@@ -102,10 +152,68 @@ const HabitCircle = ({
                   height: iconSize,
                   filter: "brightness(0) invert(1)", // Makes the SVG white
                   userSelect: "none",
+                  WebkitUserDrag: "none",
                 }}
               />
             )}
           </div>
+
+          {/* Undo Button */}
+          {isComplete && (
+            <div
+              style={{
+                position: "absolute",
+                bottom: size * 0.15, // Position inside the circle, below the icon
+                left: "50%",
+                transform: "translateX(-50%)",
+                opacity: isComplete ? 1 : 0,
+                transition: "opacity 0.3s ease",
+                zIndex: 11,
+              }}
+            >
+              <button
+                onClick={handleUndo}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%",
+                  backgroundColor: "#555",
+                  border: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "background-color 0.2s ease",
+                  userSelect: "none",
+                  WebkitUserSelect: "none",
+                  MozUserSelect: "none",
+                  msUserSelect: "none",
+                  WebkitTapHighlightColor: "transparent",
+                  WebkitTouchCallout: "none",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "#777";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "#555";
+                }}
+              >
+                {/* Undo icon from public folder */}
+                <img
+                  src="/undo.svg"
+                  alt="Undo"
+                  style={{
+                    width: "20px",
+                    height: "20px",
+                    filter: "brightness(0) invert(1)", // Makes the SVG white
+                    userSelect: "none",
+                    WebkitUserDrag: "none",
+                    pointerEvents: "none",
+                  }}
+                />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Habit Name */}
@@ -117,6 +225,9 @@ const HabitCircle = ({
             color: primaryColor,
             textAlign: "center",
             userSelect: "none",
+            WebkitUserSelect: "none",
+            MozUserSelect: "none",
+            msUserSelect: "none",
           }}
         >
           {habitName.toUpperCase()}

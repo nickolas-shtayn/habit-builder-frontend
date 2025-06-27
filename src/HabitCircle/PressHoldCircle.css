@@ -15,3 +15,17 @@
     transform: translate(0px, 0px);
   }
 }
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Prevent any highlighting on touch devices */
+*:focus {
+  outline: none;
+}

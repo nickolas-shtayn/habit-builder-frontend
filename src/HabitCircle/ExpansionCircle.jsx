@@ -1,17 +1,4 @@
-function ExpansionCircle({
-  size,
-  expandColor,
-  isExpanding,
-  onReset,
-  isComplete,
-}) {
-  const handleTransitionEnd = () => {
-    if (isExpanding && onReset) {
-      // Call reset after expansion animation completes
-      setTimeout(() => onReset(), 1000); // Match the transition duration
-    }
-  };
-
+function ExpansionCircle({ size, expandColor, isExpanding, isComplete }) {
   return (
     <div
       style={{
@@ -23,16 +10,18 @@ function ExpansionCircle({
         top: "50%",
         left: "50%",
         transform: `translate(-50%, -50%) ${
-          isExpanding ? "scale(1)" : "scale(0)"
+          isExpanding && !isComplete ? "scale(1)" : "scale(0)"
         }`,
         transition: isExpanding ? "transform 1s ease-out" : "none",
         zIndex: 1,
-        pointerEvents: isComplete ? "none" : "auto",
-        visibility: isComplete ? "hidden" : "visible",
+        pointerEvents: "none",
+        userSelect: "none",
+        WebkitUserSelect: "none",
+        MozUserSelect: "none",
+        msUserSelect: "none",
       }}
-      onTransitionEnd={handleTransitionEnd}
       onContextMenu={(e) => e.preventDefault()}
-    ></div>
+    />
   );
 }
 

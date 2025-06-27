@@ -38,16 +38,12 @@ const Dashboard = () => {
       });
 
       if (!response.ok) {
-        if (response.status === 401) {
-          localStorage.removeItem("jwt");
-          navigate("/login");
-          return;
-        }
-        throw new Error("Failed to fetch habits");
+        console.log(response);
       }
 
       const userHabits = await response.json();
       setHabits(userHabits);
+      console.log(userHabits);
     } catch (err) {
       setError(err.message);
       console.error("Error fetching habits:", err);
@@ -82,8 +78,10 @@ const Dashboard = () => {
           {habits.map((habit) => (
             <HabitCircle
               key={habit.id}
+              id={habit.id}
               habitName={habit.habit_name}
               icon={habit.icon_url}
+              isCompletedToday={habit.completedToday}
             />
           ))}
         </div>
