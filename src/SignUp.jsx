@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import AuthInput from "./AuthInput";
 import AuthButton from "./AuthButton";
 import { useNavigate, Link } from "react-router-dom";
+import { Ring } from "ldrs/react";
+import "ldrs/react/Ring.css";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -11,6 +13,7 @@ const SignUp = () => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleEmail = (event) => {
     setEmail(event.target.value);
@@ -96,6 +99,8 @@ const SignUp = () => {
       return;
     }
 
+    setIsLoading(true);
+
     try {
       const response = await fetch("http://localhost:3000/auth/register", {
         method: "POST",
@@ -114,6 +119,8 @@ const SignUp = () => {
       navigate("/onboarding");
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -154,6 +161,9 @@ const SignUp = () => {
         <AuthButton type="submit" name="Sign up" />
         <br />
       </form>
+      {isLoading ? (
+        <Ring size="40" stroke="5" bgOpacity="0" speed="2" color="black" />
+      ) : null}
       <Link to="/login">
         <AuthButton name="Login" />
       </Link>

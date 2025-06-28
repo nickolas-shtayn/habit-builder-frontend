@@ -2,12 +2,15 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import AuthInput from "./AuthInput";
 import AuthButton from "./AuthButton";
+import { Ring } from "ldrs/react";
+import "ldrs/react/Ring.css";
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleEmail = (event) => {
     setEmail(event.target.value);
@@ -29,6 +32,7 @@ const Login = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setIsLoading(true);
 
     try {
       const response = await fetch("http://localhost:3000/auth/login", {
@@ -55,6 +59,8 @@ const Login = () => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -89,6 +95,9 @@ const Login = () => {
         <AuthButton type="submit" name="Login" />
         <br></br>
       </form>
+      {isLoading ? (
+        <Ring size="40" stroke="5" bgOpacity="0" speed="2" color="black" />
+      ) : null}
       <Link to="/signup">
         <AuthButton name="Sign up" />
       </Link>

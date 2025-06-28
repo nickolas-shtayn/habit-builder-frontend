@@ -2,10 +2,13 @@ import { useState } from "react";
 import AuthInput from "./AuthInput";
 import AuthButton from "./AuthButton";
 import { useNavigate, Link } from "react-router-dom";
+import { Ring } from "ldrs/react";
+import "ldrs/react/Ring.css";
 
 const VerifyForgotPassword = () => {
   const navigate = useNavigate();
   const [verificationCode, setVerificationCode] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleVerificationCode = (event) => {
     setVerificationCode(event.target.value);
@@ -17,6 +20,7 @@ const VerifyForgotPassword = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setIsLoading(true);
 
     const email = localStorage.getItem("verification-email");
 
@@ -37,6 +41,8 @@ const VerifyForgotPassword = () => {
       navigate("/reset-password");
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -57,6 +63,9 @@ const VerifyForgotPassword = () => {
         <Link to="/login">
           <AuthButton name="Back to login" />
         </Link>
+        {isLoading ? (
+          <Ring size="40" stroke="5" bgOpacity="0" speed="2" color="black" />
+        ) : null}
       </form>
     </>
   );

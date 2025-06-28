@@ -2,6 +2,8 @@ import { useState } from "react";
 import AuthInput from "./AuthInput";
 import AuthButton from "./AuthButton";
 import { useNavigate, Link } from "react-router-dom";
+import { Ring } from "ldrs/react";
+import "ldrs/react/Ring.css";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -9,6 +11,7 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handlePassword = (event) => {
     setPassword(event.target.value);
@@ -72,6 +75,8 @@ const ResetPassword = () => {
       return;
     }
 
+    setIsLoading(true);
+
     try {
       const response = await fetch(
         "http://localhost:3000/auth/reset-password/complete",
@@ -89,6 +94,8 @@ const ResetPassword = () => {
       navigate("/login");
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -119,6 +126,9 @@ const ResetPassword = () => {
         {confirmPasswordError && <span>{confirmPasswordError}</span>}
         <AuthButton type="submit" name="Reset password" />
       </form>
+      {isLoading ? (
+        <Ring size="40" stroke="5" bgOpacity="0" speed="2" color="black" />
+      ) : null}
       <Link to="/login">
         <AuthButton name="Back to login" />
       </Link>

@@ -22,6 +22,8 @@ const HabitCircle = ({
   id,
   // Completion status
   isCompletedToday = false,
+  // New prop to disable backend requests
+  disableBackend = false,
 }) => {
   const [isExpanding, setIsExpanding] = useState(false);
   const [isComplete, setIsComplete] = useState(isCompletedToday);
@@ -38,24 +40,32 @@ const HabitCircle = ({
     setIsComplete(true);
     setIsExpanding(false); // Stop expanding when complete
 
-    const token = localStorage.getItem("jwt");
-    if (!token) {
-      navigate("/login");
-      return;
+    // Call onComplete callback first (for onboarding flow)
+    if (onComplete) {
+      onComplete();
     }
 
-    // POST request for habit completion
-    const response = await fetch(
-      `http://localhost:3000/habits/${id}/complete`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    // Only make backend request if not disabled and we have an id
+    if (!disableBackend && id) {
+      const token = localStorage.getItem("jwt");
+      if (!token) {
+        navigate("/login");
+        return;
       }
-    );
-    if (!response.ok) {
-      console.log(response);
+
+      // POST request for habit completion
+      const response = await fetch(
+        `http://localhost:3000/habits/${id}/complete`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        console.log(response);
+      }
     }
   };
 

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthInput from "./AuthInput";
 import AuthButton from "./AuthButton";
+import { Ring } from "ldrs/react";
+import "ldrs/react/Ring.css";
 
 const CreateHabit = () => {
   const navigate = useNavigate();
@@ -12,6 +14,7 @@ const CreateHabit = () => {
   const [craving, setCraving] = useState("");
   const [response, setResponse] = useState("");
   const [reward, setReward] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleName = (event) => {
     setName(event.target.value);
@@ -53,6 +56,7 @@ const CreateHabit = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setIsLoading(true);
 
     try {
       const token = localStorage.getItem("jwt");
@@ -79,6 +83,8 @@ const CreateHabit = () => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -144,6 +150,9 @@ const CreateHabit = () => {
         />
         <AuthButton type="submit" name="Create Habit" />
       </form>
+      {isLoading ? (
+        <Ring size="40" stroke="5" bgOpacity="0" speed="2" color="black" />
+      ) : null}
     </>
   );
 };

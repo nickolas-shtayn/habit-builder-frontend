@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import AuthButton from "./AuthButton";
 import HabitCircle from "./HabitCircle/HabitCircle";
 import { useNavigate } from "react-router-dom";
+import { Ring } from "ldrs/react";
+import "ldrs/react/Ring.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [habits, setHabits] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleLogout = () => {
@@ -20,7 +22,7 @@ const Dashboard = () => {
 
   const fetchHabits = async () => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       setError(null);
 
       const token = localStorage.getItem("jwt");
@@ -48,7 +50,7 @@ const Dashboard = () => {
       setError(err.message);
       console.error("Error fetching habits:", err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -56,8 +58,8 @@ const Dashboard = () => {
     fetchHabits();
   }, []);
 
-  if (loading) {
-    return <div>Loading your habits...</div>;
+  if (isLoading) {
+    return <Ring size="40" stroke="5" bgOpacity="0" speed="2" color="black" />;
   }
 
   if (error) {
