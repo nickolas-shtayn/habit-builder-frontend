@@ -4,12 +4,14 @@ import HabitCircle from "./HabitCircle/HabitCircle";
 import { useNavigate } from "react-router-dom";
 import { Ring } from "ldrs/react";
 import "ldrs/react/Ring.css";
+import DatePicker from "./DatePicker";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [habits, setHabits] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   const handleLogout = () => {
     localStorage.removeItem("jwt");
@@ -20,7 +22,23 @@ const Dashboard = () => {
     navigate("/create-habit");
   };
 
-  const fetchHabits = async () => {
+  const handlePreviousDay = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(selectedDate.getDate() - 1);
+    setSelectedDate(newDate);
+  };
+
+  const handleNextDay = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(selectedDate.getDate() + 1);
+    setSelectedDate(newDate);
+  };
+
+  const handleTodayClick = () => {
+    setSelectedDate(new Date());
+  };
+
+  const fetchHabits = async (date = selectedDate) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -31,13 +49,16 @@ const Dashboard = () => {
         return;
       }
 
-      const response = await fetch("http://localhost:3000/dashboard", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `http://localhost:3000/dashboard/${date.toISOString()}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         console.log(response);
@@ -58,6 +79,10 @@ const Dashboard = () => {
     fetchHabits();
   }, []);
 
+  useEffect(() => {
+    fetchHabits(selectedDate);
+  }, [selectedDate]);
+
   if (isLoading) {
     return <Ring size="40" stroke="5" bgOpacity="0" speed="2" color="black" />;
   }
@@ -68,6 +93,12 @@ const Dashboard = () => {
 
   return (
     <>
+      <DatePicker
+        selectedDate={selectedDate}
+        onPreviousDay={handlePreviousDay}
+        onNextDay={handleNextDay}
+        onTodayClick={handleTodayClick}
+      />
       <div>
         <div
           style={{
@@ -84,6 +115,9 @@ const Dashboard = () => {
               habitName={habit.habit_name}
               icon={habit.icon_url}
               isCompletedToday={habit.completedToday}
+              completionDate={selectedDate}
+              build={habit.build}
+              requiredReflection={habit.requiredReflection}
             />
           ))}
         </div>

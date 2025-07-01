@@ -15,6 +15,7 @@ const CreateHabit = () => {
   const [response, setResponse] = useState("");
   const [reward, setReward] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [buildHabit, setBuildHabit] = useState(true);
 
   const handleName = (event) => {
     setName(event.target.value);
@@ -42,6 +43,10 @@ const CreateHabit = () => {
 
   const handleReward = (event) => {
     setReward(event.target.value);
+  };
+
+  const handleHabitType = (value) => {
+    setBuildHabit(value);
   };
 
   const reset = () => {
@@ -74,6 +79,7 @@ const CreateHabit = () => {
           craving,
           response,
           reward,
+          build: buildHabit,
         }),
       });
 
@@ -92,6 +98,31 @@ const CreateHabit = () => {
     <>
       <h1>Create New Habit</h1>
       <form onSubmit={handleSubmit}>
+        <div>
+          <label>Habit Type:</label>
+          <div>
+            <input
+              type="radio"
+              id="build"
+              name="habitType"
+              value="build"
+              checked={buildHabit}
+              onChange={() => handleHabitType(true)}
+            />
+            <label htmlFor="build">Build Habit</label>
+          </div>
+          <div>
+            <input
+              type="radio"
+              id="break"
+              name="habitType"
+              value="break"
+              checked={!buildHabit}
+              onChange={() => handleHabitType(false)}
+            />
+            <label htmlFor="break">Break Habit</label>
+          </div>
+        </div>
         <AuthInput
           id="1"
           label="Habit Name"

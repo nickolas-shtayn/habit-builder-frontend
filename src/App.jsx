@@ -9,6 +9,7 @@ import CreateHabit from "./CreateHabit";
 import Unauthorized from "./Unauthorized";
 import VerifyForgotPassword from "./VerifyForgotPassword";
 import ResetPassword from "./ResetPassword";
+import Reflection from "./Reflection";
 
 export default function App() {
   return (
@@ -49,6 +50,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <CreateHabit />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reflection/:id"
+          element={
+            <ProtectedRoute>
+              <Reflection />
             </ProtectedRoute>
           }
         />

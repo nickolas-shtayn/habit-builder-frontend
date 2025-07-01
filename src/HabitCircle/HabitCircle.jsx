@@ -1,6 +1,7 @@
 import PressHoldCircle from "./pressHoldCircle";
 import ExpansionCircle from "./ExpansionCircle";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const HabitCircle = ({
   // Size props
@@ -20,17 +21,38 @@ const HabitCircle = ({
   onComplete,
   onReset,
   id,
-  // Completion status
   isCompletedToday = false,
   // New prop to disable backend requests
   disableBackend = false,
+  completionDate,
+  build = true,
+  // New prop for reflection requirement
+  requiredReflection = false,
 }) => {
   const [isExpanding, setIsExpanding] = useState(false);
   const [isComplete, setIsComplete] = useState(isCompletedToday);
+  const navigate = useNavigate();
+
+  // Determine colors based on build prop
+  const getColors = () => {
+    if (build) {
+      return {
+        primaryColor,
+        expandColor,
+      };
+    } else {
+      return {
+        primaryColor: "#ff4444", // Red color for breaking habits
+        expandColor: "#cc3333", // Darker red for expansion
+      };
+    }
+  };
+
+  const colors = getColors();
 
   const handlePressStart = () => {
-    if (!isComplete) {
-      // Only start if not already complete
+    if (!isComplete && !requiredReflection) {
+      // Only start if not already complete and reflection is not required
       setIsExpanding(true);
       if (onPressStart) onPressStart();
     }
@@ -60,7 +82,11 @@ const HabitCircle = ({
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            completionDate: completionDate.toISOString(),
+          }),
         }
       );
       if (!response.ok) {
@@ -89,14 +115,23 @@ const HabitCircle = ({
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({ completionDate: completionDate.toISOString() }),
       }
     );
     if (!response.ok) {
-      console.log(response);
+      const errorData = await response.json();
+      console.log(errorData.error);
     }
 
     handleReset();
+  };
+
+  const handleReflectionClick = () => {
+    if (requiredReflection && id) {
+      navigate(`/reflection/${id}`);
+    }
   };
 
   return (
@@ -125,15 +160,16 @@ const HabitCircle = ({
             alignItems: "center",
             justifyContent: "center",
           }}
+          onClick={requiredReflection ? handleReflectionClick : undefined}
         >
           <ExpansionCircle
             size={size}
-            expandColor={expandColor}
-            isExpanding={isExpanding}
+            expandColor={colors.expandColor}
+            isExpanding={requiredReflection ? false : isExpanding}
             isComplete={isComplete}
           />
           <PressHoldCircle
-            primaryColor={primaryColor}
+            primaryColor={colors.primaryColor}
             size={size}
             pressDuration={pressDuration}
             onPressStart={handlePressStart}
@@ -168,8 +204,42 @@ const HabitCircle = ({
             )}
           </div>
 
+          {/* Required Reflection Overlay */}
+          {requiredReflection ? (
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: size,
+                height: size,
+                borderRadius: "50%",
+                backgroundColor: "rgba(0, 0, 0, 0.6)",
+                backdropFilter: "blur(3px)",
+                WebkitBackdropFilter: "blur(3px)",
+                zIndex: 25,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <div
+                style={{
+                  color: "white",
+                  fontSize: "0.9rem",
+                  fontWeight: "bold",
+                  textAlign: "center",
+                  textShadow: "0 1px 2px rgba(0, 0, 0, 0.8)",
+                }}
+              >
+                Reflection Required
+              </div>
+            </div>
+          ) : null}
+
           {/* Undo Button */}
-          {isComplete && (
+          {isComplete && !requiredReflection && (
             <div
               style={{
                 position: "absolute",
@@ -232,7 +302,7 @@ const HabitCircle = ({
             marginTop: "1rem",
             fontSize: "1.2rem",
             fontWeight: "bold",
-            color: primaryColor,
+            color: colors.primaryColor,
             textAlign: "center",
             userSelect: "none",
             WebkitUserSelect: "none",
