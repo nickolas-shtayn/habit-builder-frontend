@@ -4,6 +4,7 @@ import AuthInput from "./AuthInput";
 import AuthButton from "./AuthButton";
 import { Ring } from "ldrs/react";
 import "ldrs/react/Ring.css";
+import TacticCard from "./TacticCard";
 
 const Reflection = () => {
   const navigate = useNavigate();
@@ -13,6 +14,8 @@ const Reflection = () => {
   const [bottleneck, setBottleneck] = useState("");
   const [experiment, setExperiment] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [tactics, setTactics] = useState([]);
+  const [selectedTactics, setSelectedTactics] = useState(new Set());
 
   const bottleneckOptions = [
     {
@@ -49,11 +52,38 @@ const Reflection = () => {
     setExperiment(event.target.value);
   };
 
+  const handleBottleneck = async (event) => {
+    const bottleneckString = event.target.textContent.toLowerCase();
+    setBottleneck(bottleneckString);
+    setIsLoading(true);
+
+    const token = localStorage.getItem("jwt");
+    try {
+      const response = await fetch(
+        `http://localhost:3000/habit/reflection/tactics?habitId=${id}&bottleneck=${bottleneckString}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const allTactics = await response.json();
+      setTactics(allTactics);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
 
     const token = localStorage.getItem("jwt");
+    const selectedTacticIds = Array.from(selectedTactics);
 
     try {
       const response = await fetch(
@@ -70,6 +100,7 @@ const Reflection = () => {
             bottleneck,
             experiment,
             habitId: id,
+            tacticIds: selectedTacticIds,
           }),
         }
       );
@@ -82,6 +113,18 @@ const Reflection = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleToggleTactic = (tacticId) => {
+    setSelectedTactics((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(tacticId)) {
+        newSet.delete(tacticId);
+      } else {
+        newSet.add(tacticId);
+      }
+      return newSet;
+    });
   };
 
   return (
@@ -121,7 +164,7 @@ const Reflection = () => {
           {/* REWARD*/}
           <button
             type="button"
-            onClick={() => setBottleneck("reward")}
+            onClick={handleBottleneck}
             style={{
               background: bottleneck === "reward" ? "#222" : "transparent",
               color: bottleneck === "reward" ? "#fff" : "#888",
@@ -143,7 +186,7 @@ const Reflection = () => {
           {/* CUE */}
           <button
             type="button"
-            onClick={() => setBottleneck("cue")}
+            onClick={handleBottleneck}
             style={{
               background: bottleneck === "cue" ? "#222" : "transparent",
               color: bottleneck === "cue" ? "#fff" : "#888",
@@ -165,7 +208,7 @@ const Reflection = () => {
           {/* RESPONSE */}
           <button
             type="button"
-            onClick={() => setBottleneck("response")}
+            onClick={handleBottleneck}
             style={{
               background: bottleneck === "response" ? "#222" : "transparent",
               color: bottleneck === "response" ? "#fff" : "#888",
@@ -187,7 +230,7 @@ const Reflection = () => {
           {/* CRAVING */}
           <button
             type="button"
-            onClick={() => setBottleneck("craving")}
+            onClick={handleBottleneck}
             style={{
               background: bottleneck === "craving" ? "#222" : "transparent",
               color: bottleneck === "craving" ? "#fff" : "#888",
@@ -216,6 +259,17 @@ const Reflection = () => {
           </div>
         )}
       </div>
+      {tactics.map((tactic) => (
+        <TacticCard
+          key={tactic.id}
+          id={tactic.id}
+          name={tactic.name}
+          icon={tactic.icon_url}
+          description={tactic.description}
+          selected={selectedTactics.has(tactic.id)}
+          onToggle={handleToggleTactic}
+        />
+      ))}
       <AuthInput
         label="Design the fix. What will you do different moving forward?"
         value={experiment}
