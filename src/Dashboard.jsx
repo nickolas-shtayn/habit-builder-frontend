@@ -66,7 +66,6 @@ const Dashboard = () => {
 
       const userHabits = await response.json();
       setHabits(userHabits);
-      console.log(userHabits);
     } catch (err) {
       setError(err.message);
       console.error("Error fetching habits:", err);
@@ -83,10 +82,6 @@ const Dashboard = () => {
     fetchHabits(selectedDate);
   }, [selectedDate]);
 
-  if (isLoading) {
-    return <Ring size="40" stroke="5" bgOpacity="0" speed="2" color="black" />;
-  }
-
   if (error) {
     return <div>Error: {error}</div>;
   }
@@ -99,6 +94,9 @@ const Dashboard = () => {
         onNextDay={handleNextDay}
         onTodayClick={handleTodayClick}
       />
+      {isLoading ? (
+        <Ring size="40" stroke="5" bgOpacity="0" speed="2" color="black" />
+      ) : null}
       <div>
         <div
           style={{
