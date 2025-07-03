@@ -1,6 +1,6 @@
 import PressHoldCircle from "./pressHoldCircle";
 import ExpansionCircle from "./ExpansionCircle";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const HabitCircle = ({
@@ -11,7 +11,7 @@ const HabitCircle = ({
   expandColor = "#333",
   // Icon props
   icon = null,
-  iconSize = "2rem",
+  iconSize = "4rem",
   // Text props
   habitName = "HABIT",
   // Timing props
@@ -32,6 +32,10 @@ const HabitCircle = ({
   const [isExpanding, setIsExpanding] = useState(false);
   const [isComplete, setIsComplete] = useState(isCompletedToday);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setIsComplete(isCompletedToday);
+  }, [isCompletedToday]);
 
   // Determine colors based on build prop
   const getColors = () => {
@@ -126,6 +130,11 @@ const HabitCircle = ({
     }
 
     handleReset();
+
+    // Call onComplete callback to trigger trend rerender
+    if (onComplete) {
+      onComplete();
+    }
   };
 
   const handleReflectionClick = () => {

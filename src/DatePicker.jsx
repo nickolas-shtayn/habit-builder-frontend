@@ -3,12 +3,13 @@ const DatePicker = ({
   onPreviousDay,
   onNextDay,
   onTodayClick,
+  hasHabits,
 }) => {
   const today = new Date();
 
   return (
     <>
-      <button onClick={onPreviousDay}>previous</button>
+      {hasHabits && <button onClick={onPreviousDay}>previous</button>}
       <span>{selectedDate.toDateString()}</span>
       {selectedDate.toDateString() !== today.toDateString() && (
         <button onClick={onNextDay}>next</button>
